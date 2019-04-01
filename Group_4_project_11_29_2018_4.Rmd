@@ -1,0 +1,1525 @@
+---
+title: "Group_4_Project"
+author: "Durga Rao, Praval Godre, Anshumali Shrivastava, Tushar Kumar, Dennis Black"
+date: "November 29, 2018"
+output: word_document
+---
+
+The purpose of this project is twofold, first, to fulfill the grading requirements enumerated in the Grading Rubric for Group Project directions sheet, and second, to showcase the knowledge, skills and abilities of the group members such that a potential employer would obtain a favorable light of a project members application for employment.
+The statement of purpose then from a BUAN 6356 perspective is as follows:
+
+****
+a.	Write a written report containing:
+
+***
+
+i.	Executive summary
+
+ii.	Background
+
+iii.	Objectives
+
+iv.	Data exploration
+
+v.	Predictive model or classification algorithm
+
+vi.	Results section
+
+vii.	Conclusion
+
+viii.	Marketing take away
+
+ix.	References
+
+***
+
+b.	Initial data exploration is reported to identify unusual observations and patterns. Data and dimension reduction considerations.
+
+***
+
+c.	A thorough explanation of the algorithm including a description for senior management.
+
+***
+
+d.	A well thought out results section. 
+
+***
+
+e.	A professional quality report. 
+
+***
+
+Obtain the data.
+
+Group 4 members have, individually and corporately, searched the Internet for a suitable data mining dataset, and created a list of potential data sets from the Kaggle and KDnuggets websites.
+
+Insurance data, education data, KDD competitions data, employee churn data, Right Whale identification data among other datasets were downloaded and examined. 
+
+Group 4 met a number of times in September 2018 and October 2018 to discuss the data selection, and explored and decided on bank data, but the discovery the bank data was actually an example in the course's data mining book, and discussion with the course professor, group 4, decided on another round for data exploration. 
+
+Bank data prepared by Professor Petra Berka of the University of Economics in Prague, and in the KDD 1999 competition, had characteristics Group 4 members felt would be an excellent dataset for the group project, such as, bank data with over a 1,000,000 records and loan characteristic information including default. A description of the data is at the following website:  
+
+Group 4 analysts examined KDnuggets data, 
+
+https://sorry.vse.cz/~berka/challenge/pkdd1999/berka.htm
+
+
+From Petra Berka:
+
+The data mining project for a Czech bank (for confidence reasons we are not allowed to
+give the name of the bank) was a kind of a promotional pilot study that should demonstrate
+the abilities of machine learning and data mining methods. The business goal of this study
+was to better understand the behavior of clients of the bank. The domain experts were not
+aware of the benefits of data mining technologies, so they could not give us a clear problem.
+We turned their vague ideas into a data mining goal of defining and describing various
+categories of clients according to the character of their debt. We used our experience from this
+project when preparing the Discovery Challenge on financial data.
+
+Realistic Setting
+  The data for the Financial Challenge consist of 8 tables describing clients of a bank, their
+accounts, transactions, permanent orders, granted loans and issued credit cards. Each account
+has both static characteristics (e.g. date of creation, address of the branch) given in relation
+"account" and dynamic characteristics (e.g. payments debited or credited, balances) given in
+relations "permanent order" and "transaction". Relation "client" describes characteristics of
+persons who can manipulate with the accounts. One client can have more accounts, more
+clients can manipulate with single account; clients and accounts are related together in
+relation "disposition". Relations "loan" and "credit card" describe some services which the
+bank offers to its clients; more credit cards can be issued to an account, at most one loan can
+be granted for an account. Relation "demographic data" gives some publicly available
+information about the districts.
+
+  No explicit problem was given for the analysis, nevertheless, two implicit classification     
+tasks can be found in the structure of the data: classifying clients according to loans (running
+loans with no problems, running loans with client in debt, finished contract with loan paid off,
+finished contract with loan not paid) and according to credit cards (does not own credit card,
+owns junior card, owns classic card, owns gold card). As in the real data, the classes were
+highly unbalanced. Only 15% of clients had loan contracts, out of them only 11% loans were
+with problems (running or finished). Similar proportions hold for the credit cards: only 20%
+clients used credit cards, out of them only 10% (2% of all clients) used gold cards.
+
+***
+
+The data about the clients and their accounts consist of following relations:
+
+relation account (4500 objects in the file ACCOUNT.ASC) - each record describes static characteristics of an account,
+
+relation client (5369 objects in the file CLIENT.ASC) - each record describes characteristics of a client,
+
+relation disposition (5369 objects in the file DISP.ASC) - each record relates together a client with an account,
+
+relation permanent order (6471 objects in the file ORDER.ASC) - each record describes characteristics of a payment order,
+
+relation transaction (1056320 objects in the file TRANS.ASC) - each record describes one transaction on an account,
+
+relation loan (682 objects in the file LOAN.ASC) - each record describes a loan granted for a given account,
+
+relation credit card (892 objects in the file CARD.ASC) - each record describes a credit card issued to an account,
+
+relation demographic data (77 objects in the file DISTRICT.ASC) - each record describes demographic characteristics of a district.
+
+Each account has both static characteristics (e.g. date of creation, address of the branch) given in relation "account" and dynamic characteristics (e.g. payments debited or credited, balances) given in relations "permanent order" and "transaction". Relation "client" describes characteristics of persons who can manipulate with the accounts. One client can have more accounts, more clients can manipulate with single account; clients and accounts are related together in relation "disposition". Relations "loan" and "credit card" describe some services which the bank offers to its clients; more credit cards can be issued to an account, at most one loan can be granted for an account. Relation "demographic data" gives some publicly available information about the districts (e.g. the unemployment rate); additional information about the clients can be deduced from this.
+
+***
+
+Relation account data frame
+
+***
+account_id =	identification of the account	
+district_id	= location of the branch	
+date =	date of creating of the account	in the form YYMMDD
+frequency =	frequency of issuance of statements
+
+"POPLATEK MESICNE" stands for monthly issuance
+"POPLATEK TYDNE" stands for weekly issuance
+"POPLATEK PO OBRATU" stands for issuance after transaction
+
+***    
+
+Relation client data frame
+
+***
+client_id =record identifier	
+birth number =	identification of client	the number is in the form YYMMDD for men,
+the number is in the form YYMM+50DD for women,
+where YYMMDD is the date of birth
+district_id	= address of the client	
+
+***
+
+Relation disposition data frame
+
+***
+disp_id	= record identifier	
+client_id	= identification of a client	
+account_id =	identification of an account	
+type = type of disposition (owner/user)	only owner can issue permanent orders and ask for a loan
+  
+***   
+
+Relation permanent order data frame was found to double the amount of records and not add significant information and was not used by analysts
+
+***
+order_id	= record identifier	
+account_id	= account, the order is issued for	
+bank_to =	bank of the recipient	each bank has unique two-letter code
+account_to = account of the recipient	
+amount =	debited amount	
+K_symbol =	characterization of the payment	"POJISTNE" stands for insurrance payment
+"SIPO" stands for household
+"LEASING" stands for leasing
+"UVER" stands for loan payment
+
+***
+
+Relation Transaction
+
+***
+trans_id = record identifier	
+account_id =	account, the transation deals with	
+date =	date of transaction	in the form YYMMDD
+type =	+/- transaction	"PRIJEM" stands for credit
+"VYDAJ" stands for withdrawal
+operation	=bmode of transaction	"VYBER KARTOU" credit card withdrawal
+"VKLAD" credit in cash
+"PREVOD Z UCTU" collection from another bank
+"VYBER" withdrawal in cash
+"PREVOD NA UCET" remittance to another bank
+amount	= amount of money	
+balance =	balance after transaction
+k_symbol =characterization of the transaction	"POJISTNE" stands for insurrance payment
+"SLUZBY"= stands for payment for statement
+"UROK" = stands for interest credited
+"SANKC. UROK" = sanction interest if negative balance
+"SIPO" = stands for household
+"DUCHOD"= stands for old-age pension
+"UVER" = stands for loan payment
+bank	= bank of the partner	each bank has unique two-letter code
+account	= account of the partner	
+
+*** 
+    
+Relation Loan data frame
+
+***
+loan_id	= record identifier	
+account_id =	identification of the account	
+date =	date when the loan was granted	in the form YYMMDD
+amount = amount of money	
+duration =	duration of the loan	
+payments =	monthly payments	
+status =	status of paying off the loan	
+'A' stands for contract finished, no problems,
+'B' stands for contract finished, loan not payed,
+'C' stands for running contract, OK so far,
+'D' stands for running contract, client in debt
+ 
+***  
+
+Relation Credit card data frame
+
+***
+card_id	= record identifier	
+disp_id	= disposition to an account	
+type	= type of card	possible values are "junior", "classic", "gold"
+issued	= issue date	in the form YYMMDD
+  
+***
+
+Relation Demographic data data frame
+
+***
+
+A1  = district_id	district code	
+A2	= district name	
+A3	= region	
+A4	= no. of inhabitants	
+A5	= no. of municipalities with inhabitants < 499	
+A6	= no. of municipalities with inhabitants 500-1999	
+A7	= no. of municipalities with inhabitants 2000-9999	
+A8	= no. of municipalities with inhabitants >10000	
+A9	= no. of cities	
+A10	= ratio of urban inhabitants	
+A11	= average salary	
+A12	= unemploymant rate '95	
+A13	= unemploymant rate '96	
+A14	= no. of enterpreneurs per 1000 inhabitants	
+A15	= no. of commited crimes '95	
+A16 =	no. of commited crimes '96
+
+***************************************************************
+***************************************************************
+
+data and primary keys
+
+Loan data
+Primary key: account_id
+
+Transaction data
+Primary key: account_id
+
+Account data
+Primary Key: account_id
+secondary Key: district_id
+
+Demographic data
+Primary Key: district_id
+
+Disposition data
+Primary Key: account_id
+secondary Key: client_id
+tertiary Key: disp_id
+
+Credit Card data
+Primary Key: disp_id
+
+Client data
+Primary Key: client_id
+secondary Key: district_id
+
+***
+
+Step 1. The data was left joined on account_id for loan data, tranaction data, account_data. 
+Step 2. The left joined data result of step 1 was left joined to the district data on district_id.
+Step 3. The result of step 1 and step 2 was left joined with disposition data by disp_id.
+Step 4. The result of step 1, step 2 and step 3 was left joined with card data by disp_id.
+Step 5. The result of step 1, step 2, step 3 and step 4 was left joined with the client data by client_id
+
+The final data frame has 1,262,625 records. The final data was validate by three team members. 
+
+
+***************************************************************
+***************************************************************
+
+Loan data
+
+***************************************************************
+***************************************************************
+
+Integer variables 
+
+loan_id      = record identifier    
+account_id   = identification of the account	     
+date         = date when the loan was granted	in the form YYMMDD         
+amount       = loan amount  
+duration     = duration of the loan
+payments     = monthly payments  
+
+account_id_loans /* this is a created variable to differentiate between other data account ids
+
+* factor variables
+status 
+
+'A' stands for contract finished, no problems,
+'B' stands for contract finished, loan not payed,
+'C' stands for running contract, OK so far,
+'D' stands for running contract, client in debt
+	
+
+
+
+```{r, echo=FALSE}
+library(dplyr)
+library(data.table)
+account.df <- read.csv("account.csv")
+card.df <- read.csv("card.csv")
+client.df <- read.csv("client.csv")
+disp.df <- read.csv("disp.csv")
+district.df <- read.csv("district.csv")
+str(district.df)
+loans.df <- read.csv("loan.csv")
+order.df <- read.csv("order.csv")
+# trans.df <- read.csv("trans.csv")
+trans.df <- data.frame(fread("trans.csv"))
+
+names(district.df) <- c("district_id","district_name",
+                        "region","num_of_inhabitants",
+                        "num_of_municipalities_with_inhabitants_LT_499",
+                        "num_of_municipalities_with_inhabitants_500_1999",
+                        "num_of_municipalities_with_inhabitants_2000_9999",
+                        "num_of_municipalities_with_inhabitants_GT_10000",
+                        "num_of_cities",
+                        "Ratio_of_urban_inhabitants",
+                        "Average_Salary",
+                        "unemployment_rate_in_1995",
+                        "unemployment_rate_in_1996",
+                        "num_of_enterpreneurs_per_1000_inhabitants",
+                        "num_of_crimes_commited_in_1995",
+                        "num_of_crimes_commited_in_1996")
+
+head(district.df)
+
+leftjoindat_trans_loans <- left_join(trans.df, loans.df, by = "account_id")
+
+leftjoindat_trans_loans_account <- left_join(leftjoindat_trans_loans, account.df, by = "account_id")
+
+leftjoindat_trans_loans_account_district <- left_join(leftjoindat_trans_loans_account,district.df, by = "district_id")
+
+leftjoindat_trans_loans_account_district_disp <- left_join(leftjoindat_trans_loans_account_district,disp.df, by = "account_id")
+
+leftjoindat_trans_loans_account_district_disp_card <- left_join(leftjoindat_trans_loans_account_district_disp,card.df, by = "disp_id")
+
+leftjoindat_trans_loans_account_district_disp_card_client <- left_join(leftjoindat_trans_loans_account_district_disp_card,client.df, by = "client_id")
+
+str(leftjoindat_trans_loans_account_district_disp_card_client)
+
+names(leftjoindat_trans_loans_account_district_disp_card_client)
+
+final.data.df = leftjoindat_trans_loans_account_district_disp_card_client
+str(final.data.df)
+```
+
+
+```{r, echo=FALSE}
+final.data.df$k_symbol[which(final.data.df$k_symbol=="")] = NA
+final.data.df$bank[which(final.data.df$bank=="")] = NA
+final.data.df$operation[which(final.data.df$operation=="")] = NA
+
+NA_population <- as.data.frame(colSums(is.na(final.data.df)))
+names(NA_population) <- "NA population"
+#NA_population
+
+Number_Populated <- as.data.frame(colSums(!is.na(final.data.df)))
+names(Number_Populated) <- "Number populated"
+Number_Populated
+
+#table(final.data.df$operation)
+#table(as.data.frame(colSums(is.na(final.data.df))))
+#names(which(colSums(is.na(final.data.df))!=0))
+
+
+
+```
+
+
+Now Exploratory Data Analysis
+The following is a list of fields in the final.data.df
+
+#trans_id                               
+#date.x                                           
+operation                                        
+balance                                          
+bank                                             
+#loan_id                                          
+amount.y                                        
+payments                                         
+district_id.x                                    
+date                                         
+region                                        
+num_of_municipalities_with_inhabitants_LT_499    
+num_of_municipalities_with_inhabitants_2000_9999 
+num_of_cities                                    
+Average_Salary                                   
+unemployment_rate_in_1996                        
+num_of_crimes_commited_in_1995                   
+#disp_id                                          
+type.y                                           
+type                                             
+birth_number                                     
+#account_id                                 
+type.x                                         
+amount.x                                     
+k_symbol                                       
+account  (transaction data account of partner)                                    
+date.y                                        
+duration                                     
+status                                      
+frequency                                       
+district_name                                   
+num_of_inhabitants                              
+num_of_municipalities_with_inhabitants_500_1999 
+num_of_municipalities_with_inhabitants_GT_10000 
+Ratio_of_urban_inhabitants                    
+unemployment_rate_in_1995                     
+num_of_enterpreneurs_per_1000_inhabitants      
+num_of_crimes_commited_in_1996                
+#client_id                                      
+#card_id                                         
+issued                                          
+district_id.y     
+
+
+
+```{r, echo=FALSE}
+table(final.data.df$operation)
+```
+Mode of Transaction	
+'VYBER KARTOU' stands for Credit Card Withdrawal
+'VKLAD' stands for Credit in Cash
+'PREVOD Z UCTU' stands for Collection from Another Bank
+'VYBER' stands for Withdrawal in Cash
+'PREVOD NA UCET' stands for Remittance to Another Bank
+```{r, echo=FALSE}
+hist(final.data.df$balance,main ="Histogram of account balance",xlab= "Account balance",col = "orange")
+boxplot(final.data.df$balance,ylab="Account balance")
+summary(final.data.df$balance)
+```
+There are negative balances and balances are skewed to the right and the boxplot gives lots off outliers with larger accounts managment might want to explore these larger accounts
+```{r, echo=FALSE}
+table(final.data.df$bank)
+```
+We observe that bank labels have lots of missing values
+
+These are the amount of the loan data, transactions are x and loans are y
+```{r, echo=FALSE}
+options(scipen=999)
+hist(final.data.df$amount.x,main = "Histogram of transaction amount", xlab = "transaction amount", ylim = c(0,1000000),col = "orange") 
+boxplot(final.data.df$amount.x,ylab="transaction amount") 
+summary(final.data.df$amount.x)
+hist(final.data.df$amount.y,main = "Histogram of total loan amount", xlab = "total loan amount",ylim = c(0,80000),col = "violet") 
+boxplot(final.data.df$amount.y, ylab = "total loan amount")
+summary(final.data.df$amount.y)
+
+```
+Boxplots are amount.x and amount.y
+
+These are monthly payments in the loan.df file
+```{r, echo=FALSE}
+hist(final.data.df$payments,main = "Histogram of monthly loan amount payments",xlab = "Monthly Payment Amount",ylim = c(0,35000),col = "orange")
+summary(final.data.df$payments)
+```
+
+date is from account.df and the the date the account was created
+date.x is from the transaction.df data and is the date of the transaction
+date.y is from the loan.df data and is the date the loan was granted
+
+We will use hist to see if there is a peak in the date distribution
+```{r, echo=FALSE}
+
+hist(as.numeric(paste("19",substr(final.data.df$date,1,2),sep = "")),main="Histogram of yearly accounts opened",xlab="Year",ylim=c(0,700000),col = "orange")
+hist(as.numeric(paste("19",substr(final.data.df$date.x,1,2),sep = "")),main="Histogram of Yearly transactions",xlab="Year")
+hist(as.numeric(paste("19",substr(final.data.df$date.y,1,2),sep = "")),main="Histogram of Yearly loans granted",xlab="Year",ylim=c(0,70000),col = "orange")
+# hist(final.data.df$date)
+# hist(final.data.df$date.x)
+# hist(final.data.df$date.y)
+
+# note the dates are yymmdd  for the date.y the first class in the histogram is yymmdd so the year is 93 the mm dd do not count this is a general class so notice 94 had a lot of transactions. 
+```
+
+
+```{r, echo=FALSE}
+table(final.data.df$region)
+
+```
+```{r, echo=FALSE}
+table(final.data.df$num_of_municipalities_with_inhabitants_LT_499)
+```
+The way to read the above table is that, for example, there are 290910 records with 0 municipalities LT 499
+
+```{r, echo=FALSE}
+table(final.data.df$num_of_municipalities_with_inhabitants_2000_9999 )
+```
+We observe that there are 248771 records with no muni's with population 2000 - 9999
+
+```{r, echo=FALSE}
+table(final.data.df$num_of_cities)     
+```
+
+```{r, echo=FALSE}
+hist(final.data.df$Average_Salary,main = "Histogram of average salary",xlab = "Salary",xlim = c(8000,13000),col="yellow",ylim = c(0,200000))
+boxplot(final.data.df$Average_Salary, ylab="Average Salary")
+summary(final.data.df$Average_Salary)
+```
+
+```{r, echo=FALSE}
+hist(final.data.df$unemployment_rate_in_1995,main = "unemployment in 1995",xlab = "district no",xlim = c(0,10),col="blue",ylim = c(0,200000))
+summary(final.data.df$unemployment_rate_in_1995)
+hist(final.data.df$unemployment_rate_in_1996,main = "unemployment in 1996",xlab = "district no",xlim = c(0,10),col="blue",ylim = c(0,200000))
+summary(final.data.df$unemployment_rate_in_1996)
+```
+
+
+As the unemployment rate increases there is a statistical relationship with a higher number of cities       
+
+```{r, echo=FALSE}
+hist(as.numeric(final.data.df$num_of_crimes_commited_in_1995),main = "Histogram of num of crimes commited in 1995",xlab = "No. of crimes in 1995",col = "red",xlim = c(0,100000))
+hist(as.numeric(final.data.df$num_of_crimes_commited_in_1996),main = "Histogram of num of crimes commited in 1996",xlab = "No. of crimes in 1996",col = "red",xlim = c(0,100000))
+table(final.data.df$num_of_crimes_commited_in_1995,final.data.df$num_of_cities)
+```
+type.x (tranaction data base)
+type.y (loan data)
+type (dispostion)
+```{r, echo=FALSE}
+table(final.data.df$type.x)
+table(final.data.df$type.y)
+table(final.data.df$type)
+```
+"PRIJEM" stands for credit
+VYBER' stands for Withdrawal in Cash
+"VYDAJ" stands for withdrawal
+
+
+birth number is client data
+birth number	
+identification of client
+the number is in the form YYMMDD for men,
+the number is in the form YYMM+50DD for women,
+where YYMMDD is the date of birth
+
+```{r, echo=FALSE}
+hist(as.numeric(paste("19",substr(final.data.df$birth_number,1,2),sep = "")),xlim=c(1900,2000),main = "birth",xlab= "Year",col="green",ylim = c(0,140000))
+```
+
+
+```{r, echo=FALSE}
+k_symbol <- as.data.frame(table(final.data.df$k_symbol))
+print(k_symbol)
+```
+k_symbol is from the tranaction data
+
+"POJISTNE" stands for insurrance payment
+"SLUZBY" stands for payment for statement
+"UROK" stands for interest credited
+"SANKC. UROK" sanction interest if negative balance
+"SIPO" stands for household
+"DUCHOD" stands for old-age pension
+"UVER" stands for loan payment
+ 
+ Next: transaction data account of partner 
+ no information here
+ 
+```{r, echo=FALSE}
+summary(final.data.df$account)  
+       
+```
+ 
+duration is the life of the loan
+this is the loan term
+
+```{r, echo=FALSE}
+table(final.data.df$duration)
+```
+
+status is A B C D                                 
+```{r, echo=FALSE}
+table(final.data.df$status)
+
+```
+'A' stands for contract finished, no problems,
+'B' stands for contract finished, loan not payed,
+'C' stands for running contract, OK so far,
+'D' stands for running contract, client in debt
+
+
+
+frequency is in the account database
+
+```{r, echo=FALSE}
+table(final.data.df$frequency)
+```
+
+
+frequency of issuance of statements	
+"POPLATEK MESICNE" stands for monthly issuance
+"POPLATEK TYDNE" stands for weekly issuance
+"POPLATEK PO OBRATU" stands for issuance after transaction
+
+
+```{r, echo=FALSE}
+district.name.df <- as.data.frame(table(final.data.df$district_name))
+#district.name.df
+```
+
+```{r, echo=FALSE}
+hist(final.data.df$num_of_inhabitants,main="Histogram of No. of inhabitants",xlab = "No. of inhabitants",col = "orange")
+```
+                                
+                           
+
+
+
+```{r, echo=FALSE}
+final.data.df$num_of_municipalities_with_inhabitants_500_1999
+
+
+```
+num_of_municipalities_with_inhabitants_500_1999)
+
+```{r, echo=FALSE}
+table(final.data.df$num_of_municipalities_with_inhabitants_GT_10000 )
+#table(unique(final.data.df$num_of_municipalities_with_inhabitants_GT_10000))
+```
+num_of_municipalities_with_inhabitants_GT_10000
+```{r, echo=FALSE}
+hist(final.data.df$Ratio_of_urban_inhabitants,main = "Histogram of the ratio of urban to rural inhabitants",xlab = "% of urban inhabitants",col = "yellow")
+```
+
+
+
+     
+     
+```{r, echo=FALSE}
+hist(final.data.df$num_of_enterpreneurs_per_1000_inhabitants,main = "Histogram of num of entrepreneurs per 1000 inhabitants",col = "blue",xlim = c(80,180))      
+```
+               
+
+
+```{r, echo=FALSE}
+hist(final.data.df$num_of_crimes_commited_in_1996,main = "Histogram of number of crimes commited in 1996",xlab = "No. of crimes",col = "red",ylim = c(0,800000))   
+#table(final.data.df$num_of_crimes_commited_in_1996)       
+```
+
+         
+checking loan data
+```{r, echo=FALSE}
+loan.data.df <- subset(final.data.df,subset=(!is.na(loan_id))) 
+table(loan.data.df$status)
+```
+
+issued	issue date	in the form YYMMDD (credit card data)
+
+
+
+
+```{r, echo=FALSE}
+#table(final.data.df$issued)
+```
+
+
+
+```{r, echo=FALSE}
+#table(final.data.df$district_id.x)
+#table(final.data.df$district_id.y)
+```
+
+look at loan versus non loan obligor
+
+```{r, echo=FALSE}
+loan.nonloan.data.df <- as.data.frame(ifelse(!is.na(final.data.df$loan_id), 1, 0))
+names(loan.nonloan.data.df) <- "loan_dummy"
+#str(loan.nonloan.data.df)
+table(loan.nonloan.data.df$loan_dummy)
+final.data.loan.dummy.df <- cbind(final.data.df,loan.nonloan.data.df)
+#str(final.data.loan.dummy.df)
+#lm.reg <- lm(loan_dummy ~ Average_Salary+region + num_of_crimes_commited_in_1996, final.data.loan.dummy.df )
+#summary(lm.reg)
+
+```
+
+good loan verus bad loan
+
+```{r, echo=FALSE}
+loan.data.df <- subset(final.data.df,subset=(!is.na(loan_id))) 
+table(loan.data.df$status)
+
+bad.good.loan.data.df <- as.data.frame(ifelse(loan.data.df$status == "B"|loan.data.df$status == "D", 1, 0))
+names(bad.good.loan.data.df) <- "bad_good_dummy"
+table(bad.good.loan.data.df)
+
+final.bad.good.data.df <- cbind(loan.data.df,bad.good.loan.data.df)
+#str(final.bad.good.data.df)
+
+one.data.df <- subset(final.bad.good.data.df,bad_good_dummy == 1)
+zero.data.df <- subset(final.bad.good.data.df,bad_good_dummy == 0 )
+
+set.seed(5)
+sample_size <- c(22760/210867)
+#print(sample_size)
+zero.rows<-sample(rownames(zero.data.df), 0.1079353*dim(zero.data.df)[1])
+zero.rand.df <- zero.data.df[zero.rows,]
+final.zero.one.df <- rbind(one.data.df,zero.rand.df)
+
+table(final.zero.one.df$bad_good_dummy)
+table(final.bad.good.data.df$bad_good_dummy)
+
+## now put bad_good_dummy back onto the loan.data.df data
+
+```
+
+
+```{r}
+# do pca here and profile good versus bad obligor
+
+str(final.bad.good.data.df)
+data.for.plot1 <- aggregate(final.bad.good.data.df$Average_Salary, by = list(final.bad.good.data.df$bad_good_dummy) ,FUN=mean)
+names(data.for.plot1) <- c("bad_good", "meanSalary")
+barplot(data.for.plot1$meanSalary, names.arg = data.for.plot1$bad_good, xlab ="good bad dummy", ylab = "ave salary" )
+
+data.for.plot2 <- aggregate(final.bad.good.data.df$amount.y , by = list(final.bad.good.data.df$bad_good_dummy) ,FUN=mean)
+names(data.for.plot2) <- c("bad_good", "meanLoanAmount")
+barplot(data.for.plot2$meanLoanAmount, names.arg = data.for.plot2$bad_good, xlab ="good bad dummy", ylab = "ave loan amount" )
+
+
+data.for.plot3 <- aggregate(final.bad.good.data.df$num_of_inhabitants , by = list(final.bad.good.data.df$bad_good_dummy) ,FUN=mean)
+names(data.for.plot3) <- c("bad_good", "meanPop")
+barplot(data.for.plot3$meanPop, names.arg = data.for.plot3$bad_good, xlab ="good bad dummy", ylab = "ave population" )
+
+data.for.plot4 <- aggregate(final.bad.good.data.df$num_of_municipalities_with_inhabitants_LT_499  , by = list(final.bad.good.data.df$bad_good_dummy) ,FUN=mean)
+names(data.for.plot4) <- c("bad_good", "meanPopLT499")
+barplot(data.for.plot4$meanPopLT499, names.arg = data.for.plot4$bad_good, xlab ="good bad dummy", ylab = "sum number of muni LT 499" )
+
+data.for.plot5 <- aggregate(final.bad.good.data.df$num_of_municipalities_with_inhabitants_500_1999  , by = list(final.bad.good.data.df$bad_good_dummy) ,FUN=mean)
+names(data.for.plot5) <- c("bad_good", "meanPop500_1999")
+barplot(data.for.plot5$meanPop500_1999, names.arg = data.for.plot5$bad_good, xlab ="good bad dummy", ylab = "ave population district btw 500 and 1999" )
+
+data.for.plot6 <- aggregate(final.bad.good.data.df$num_of_municipalities_with_inhabitants_2000_9999 , by = list(final.bad.good.data.df$bad_good_dummy) ,FUN=mean)
+names(data.for.plot6) <- c("bad_good", "meanPop2000_9999")
+barplot(data.for.plot6$meanPop2000_9999, names.arg = data.for.plot6$bad_good, xlab ="good bad dummy", ylab = "ave population district btw 2000 and 9999" )
+
+data.for.plot7 <- aggregate(final.bad.good.data.df$num_of_municipalities_with_inhabitants_GT_10000  , by = list(final.bad.good.data.df$bad_good_dummy) ,FUN=mean)
+names(data.for.plot7) <- c("bad_good", "meanPopGT_10000")
+barplot(data.for.plot7$meanPopGT_10000, names.arg = data.for.plot7$bad_good, xlab ="good bad dummy", ylab = "ave population district btw GT 10000" )
+
+
+data.for.plot8 <- aggregate(final.bad.good.data.df$num_of_cities, by = list(final.bad.good.data.df$bad_good_dummy) ,FUN=mean)
+names(data.for.plot8) <- c("bad_good", "meanNumCities")
+barplot(data.for.plot8$meanNumCities, names.arg = data.for.plot8$bad_good, xlab ="good bad dummy", ylab = "ave number of cities in the districts" )
+
+ 
+data.for.plot9 <- aggregate(final.bad.good.data.df$Ratio_of_urban_inhabitants   , by = list(final.bad.good.data.df$bad_good_dummy) ,FUN=mean)
+names(data.for.plot9) <- c("bad_good", "meanRatioUbanPop")
+barplot(data.for.plot9$meanRatioUbanPop, names.arg = data.for.plot9$bad_good, xlab ="good bad dummy", ylab = "mean ratio of urban pop in a district" )
+
+
+data.for.plot10 <- aggregate(final.bad.good.data.df$unemployment_rate_in_1996 , by = list(final.bad.good.data.df$bad_good_dummy) ,FUN=mean)
+names(data.for.plot10) <- c("bad_good", "meanunemp1996")
+barplot(data.for.plot10$meanunemp1996, names.arg = data.for.plot10$bad_good, xlab ="good bad dummy", ylab = "mean unemployment 1996" )
+
+data.for.plot11 <- aggregate(final.bad.good.data.df$num_of_crimes_commited_in_1996, by = list(final.bad.good.data.df$bad_good_dummy) ,FUN=mean)
+names(data.for.plot11) <- c("bad_good", "meancrimes1996")
+barplot(data.for.plot11$meancrimes1996, names.arg = data.for.plot11$bad_good, xlab ="good bad dummy", ylab = "mean crimes 1996" )
+
+
+```
+
+
+
+
+creating one zero data so analysts can get 
+create categorical varialbes of continous variables using percentiles in the summary function
+
+
+```{r, echo=FALSE}
+
+
+summary(final.data.df$amount.x)
+final.data.df$amount_trans <- as.numeric(ifelse(final.data.df$amount.x < 6694, 0, 1))
+table(final.data.df$amount_trans)
+summary(final.data.df$balance)
+final.data.df$balance_trans <- as.numeric(ifelse(final.data.df$balance < 49436, 0, 1))
+table(final.data.df$balance_trans)
+summary(final.data.df$Average_Salary)
+final.data.df$Average_Salary_demographic <- as.numeric(ifelse(final.data.df$Average_Salary < 9920, 0, 1))
+table(final.data.df$Average_Salary_demographic)
+
+
+
+# Get levels and add "None"
+levels <- levels(final.data.df$operation)
+levels[length(levels) + 1] <- "None"
+
+# refactor operation to include "None" as a factor level
+# and replace NA with "None"
+final.data.df$operation <- factor(final.data.df$operation, levels = levels)
+final.data.df$operation[is.na(final.data.df$operation)] <- "None"
+table(final.data.df$operation)
+
+# Get levels and add "None"
+levels <- levels(final.data.df$k_symbol)
+levels[length(levels) + 1] <- "None"
+
+
+final.data.df$k_symbol <- factor(final.data.df$k_symbol, levels = levels)
+final.data.df$k_symbol[is.na(final.data.df$k_symbol)] <- "None"
+table(final.data.df$k_symbol)
+
+# Get levels and add "None"
+levels <- levels(final.data.df$bank)
+levels[length(levels) + 1] <- "None"
+
+
+final.data.df$bank <- factor(final.data.df$bank, levels = levels)
+final.data.df$bank[is.na(final.data.df$bank)] <- "None"
+table(final.data.df$bank)
+
+# Get levels and add "None"
+levels <- levels(final.data.df$region)
+levels[length(levels) + 1] <- "None"
+
+
+final.data.df$region <- factor(final.data.df$region, levels = levels)
+final.data.df$bank[is.na(final.data.df$region)] <- "None"
+table(final.data.df$region)
+
+# Get levels and add "None"
+levels <- levels(final.data.df$type)
+levels[length(levels) + 1] <- "None"
+
+
+final.data.df$type <- factor(final.data.df$type, levels = levels)
+final.data.df$type[is.na(final.data.df$type)] <- "None"
+table(final.data.df$type)
+
+type.x.dummy <- as.data.frame(model.matrix(~ 0 + type.x, data=final.data.df))
+#str(type.x.dummy)
+operation.dummy <- as.data.frame(model.matrix(~ 0 + operation, data=final.data.df))
+#str(operation.dummy)
+k_symbol.dummy <- as.data.frame(model.matrix(~ 0 +  k_symbol, data=final.data.df))
+#str(k_symbol.dummy)
+bank.dummy <- as.data.frame(model.matrix(~ 0 + bank , data=final.data.df))
+#str(bank.dummy)
+type.dummy <- as.data.frame(model.matrix(~ 0 + type , data=final.data.df))
+#str(type.dummy)
+
+
+
+final.data.df$region <- as.factor(gsub(" ","_",final.data.df$region))
+table(final.data.df$region)
+
+region.dummy <- as.data.frame(model.matrix(~ 0 + region , data=final.data.df))
+#str(region.dummy)
+
+
+final.data.rules.df <- cbind(final.data.df,type.x.dummy,operation.dummy,k_symbol.dummy,bank.dummy,region.dummy,type.dummy)
+#str(final.data.rules.df)
+which(colSums(is.na(final.data.rules.df))!=0)
+```
+
+Now look at association rules and collaborative filtering
+
+```{r, echo=FALSE}
+library(arules)
+
+#str(final.data.rules.df)
+set.seed(72)
+train.rows <- sample(rownames(final.data.rules.df), 0.80*dim(final.data.rules.df)[1])
+train.df<- final.data.rules.df[train.rows,]
+valid.rows <- setdiff(rownames(final.data.rules.df), train.rows)
+valid.df <- final.data.rules.df[valid.rows,]
+#table(train.df$amount_trans) 
+#table(train.df$balance_trans)#44
+#table(train.df$Average_Salary_demographic)#45
+#table(train.df$type.xPRIJEM) #46                                   
+#table(train.df$type.xVYBER) #47                                   
+#table(train.df$type.xVYDAJ) #48                                   
+#str(train.df)
+#rules.data.df <- train.df[,c(43:92)] 
+rules.data.df <- valid.df[,c(43:92)] 
+rules.matrix <- as.matrix(rules.data.df)
+rules.trans <- as(rules.matrix,"transactions")
+rules <- apriori(rules.trans, parameter=list(supp=0.2,conf=0.5, target = "rules"))
+inspect(head(sort(rules,by = "lift"), n=50))
+
+
+```
+k_symbol
+"POJISTNE" stands for insurrance payment
+"SIPO" stands for household
+"LEASING" stands for leasing
+"UVER" stands for loan payment
+
+transaction type.x
+"PRIJEM" stands for credit
+"VYDAJ" stands for withdrawal
+
+transaction operation
+"VYBER KARTOU" credit card withdrawal
+"VKLAD" credit in cash
+"PREVOD Z UCTU" collection from another bank
+"VYBER" withdrawal in cash
+"PREVOD NA UCET" remittance to another bank
+
+bank of the partner
+
+
+
+CLUSTERING  
+
+```{r, echo=FALSE}
+data.loan.df <- as.data.frame(ifelse(final.data.df$status == "B"|final.data.df$status == "D", 1, 0))
+#str(data.loan.df)
+names(data.loan.df) <- "bad_good_dummy"
+#str(data.loan.df)
+table(data.loan.df)
+final.data.loan.df <- cbind(final.data.df,data.loan.df)
+str(final.data.loan.df)
+
+
+cluster.df <- as.data.frame(final.data.loan.df[,c(21:28,30,33,45,46)])
+# 21:28 are the demographic variables 30 is average salary , 33 is number of entreprenures, 45 is transaction balance and 46 is bad good dummy
+#str(cluster.df)
+table(cluster.df$bad_good_dummy)
+
+demographics.df <- na.omit(cluster.df)
+#str(demographics.df)
+demographics.df1 <- demographics.df[,c(1:3,12)]
+
+for.cluster1 <-as.data.frame(aggregate(demographics.df1$num_of_inhabitants, by = list(demographics.df1$region),FUN=mean))
+for.cluster2 <-as.data.frame(aggregate(demographics.df1$num_of_municipalities_with_inhabitants_LT_499 , by = list(demographics.df1$region),FUN=mean))
+for.cluster3 <-as.data.frame(aggregate(demographics.df1$bad_good_dummy , by = list(demographics.df1$region),FUN=mean))
+
+colnames(for.cluster1)<- c("region","mean_num_of_inhabitants")
+colnames(for.cluster2)<- c("region","mean_num_of_municipalities_with_inhabitants_LT_499")
+colnames(for.cluster3)<- c("region","bad_good_dummy")
+str(for.cluster1)
+str(for.cluster2)
+str(for.cluster3)
+
+final.cluster.data1 <- merge(for.cluster1,for.cluster2,by.for.cluster1 ="region", by.for.cluster2 ="region")
+final.cluster.data2 <- merge(final.cluster.data1, for.cluster3,by.final.cluster.data1 = "region", by.for.cluster3 ="region")
+
+row.names(final.cluster.data2) <- final.cluster.data2[,1]
+final.cluster.data <- final.cluster.data2[,-1]
+
+final.cluster.data.norm <- sapply(final.cluster.data,scale)
+row.names(final.cluster.data.norm) <- row.names(final.cluster.data)
+  
+d.norm <- dist(final.cluster.data.norm , method = "euclidean")
+hc1 <-hclust(d.norm, method="single")
+plot(hc1)
+
+#now just good bad
+
+final.cluster.good.bad <- as.data.frame(final.cluster.data2[,-c(1:3)])
+colnames(final.cluster.good.bad) <- "good_bad"
+row.names(final.cluster.good.bad) <- row.names(final.cluster.data2)
+final.cluster.good.bad.norm <- sapply(final.cluster.good.bad ,scale)
+row.names(final.cluster.good.bad.norm) <- row.names(final.cluster.data)
+  
+d.norm2 <- dist(final.cluster.good.bad.norm  , method = "euclidean")
+hc2 <-hclust(d.norm2, method="single")
+plot(hc2)
+
+```
+
+Now look at PCA
+
+final.cluster.data 
+
+```{r}
+pca <- prcomp(na.omit(final.cluster.data), scale=T)
+summary(pca)
+str(cluster.df)
+
+pca.data.df <- cluster.df[,-c(1,12)]
+str(pca.data.df)
+names(pca.data.df)
+pca1 <- prcomp(na.omit(pca.data.df), scale=T)
+summary(pca1)
+pca1$rotation[,1:4]
+```
+
+
+
+
+
+now look at CART
+looking at all the 233000 records not oversampled.
+```{r, echo=FALSE}
+# turn this on and off for all or oversampled data
+final.zero.one.df <- final.bad.good.data.df #not oversampled here
+#str(final.zero.one.df)
+set.seed(271)
+train.cart.rows <-sample(rownames(final.zero.one.df), 0.8*dim(final.zero.one.df)[1])
+train.cart.df <- final.zero.one.df[train.cart.rows,]
+valid.cart.rows <- setdiff(rownames(final.zero.one.df),train.cart.rows)
+valid.cart.df <- final.zero.one.df[valid.cart.rows,]
+str(train.cart.df)
+
+table(train.cart.df$operation)
+
+#str(train.cart.df)
+
+target.data.df <- train.cart.df[,c(4,5,6,7,8:9,22:29,31,32,34,43)]
+#target.data.df <- train.cart.df[,c(4,43)]
+str(target.data.df)
+library(rpart)
+library(rpart.plot)
+library(caret)
+
+
+class.tree <- rpart(bad_good_dummy ~ ., data = target.data.df, method = "class")
+options(scipen = 999)
+prp(class.tree, type=1, extra=1, split.font = 1,varlen = -5)
+rpart.plot(class.tree, type=4, digits=-3)
+
+predict.train <- as.data.frame(as.numeric(predict(class.tree, target.data.df, type = "class")))
+#str(predict.train)
+colnames(predict.train) <- "predicted"
+#str(predict.train)
+table(predict.train)
+predict.train$predicted <- ifelse(predict.train$predicted == 2,1,0)
+table(predict.train$predicted)
+table(predict.train$predicted,target.data.df$bad_good_dummy )
+confusionMatrix(data= table(predict.train$predicted, target.data.df$bad_good_dummy))
+
+
+#deeper.tree <-  rpart(bad_good_dummy ~ ., data = target.data.df, method = "class", cp=0.1, minsplit=1)
+
+#length(deeper.tree$frame$var[deeper.tree$frame$var == "<leaf>"])
+
+#prp(deeper.tree, type = 1, extra = 1, under = TRUE, split.font =1, varlen = -10, box.col=ifelse(deeper.tree$frame$var == "<leaf>", 'gray', 'white'))
+
+
+
+
+```
+
+
+looking at CART with the rules data oversampling (option for no oversampling)
+
+```{r, echo=FALSE}
+
+loan.data.rules.df <- subset(final.data.rules.df,subset=(!is.na(loan_id))) 
+#str(loan.data.rules.df)
+table(loan.data.rules.df$status)
+
+bad.good.loan.data.rules.df <- as.data.frame(ifelse(loan.data.rules.df$status == "B"|loan.data.rules.df$status == "D", 1, 0))
+names(bad.good.loan.data.rules.df) <- "bad_good_dummy"
+table(bad.good.loan.data.rules.df)
+
+final.bad.good.data.rules.df <- cbind(loan.data.rules.df,bad.good.loan.data.rules.df)
+#str(final.bad.good.data.rules.df)
+
+one.data.rules.df <- subset(final.bad.good.data.rules.df,bad_good_dummy == 1)
+zero.data.rules.df <- subset(final.bad.good.data.rules.df,bad_good_dummy == 0 )
+#str(one.data.rules.df)
+#str(zero.data.rules.df)
+
+set.seed(5)
+sample_size <- c(22760/210867)
+#print(sample_size)
+zero.rows.rules<-sample(rownames(zero.data.rules.df), 0.1*dim(zero.data.rules.df)[1])
+zero.rand.rules.df <- zero.data.rules.df[zero.rows.rules,]
+final.zero.one.rules.df <- rbind(one.data.rules.df,zero.rand.rules.df)
+
+table(final.zero.one.rules.df$bad_good_dummy)
+str(final.zero.one.rules.df)
+
+
+
+
+
+#####################################
+# no oversampling here
+#set.seed(275)
+#train.cart.rows.rules <-sample(rownames(final.bad.good.data.rules.df), 0.8*dim(final.bad.good.data.rules.df)[1])
+#train.cart.rules.df <- final.bad.good.data.rules.df[train.cart.rows.rules,]
+#valid.cart.rows.rules <- setdiff(rownames(final.bad.good.data.rules.df),train.cart.rows.rules)
+#valid.cart.rules.df <- final.bad.good.data.rules.df[valid.cart.rows.rules,]
+#str(train.cart.rules.df)
+############################################################
+# oversampling
+set.seed(271)
+train.cart.rows.rules <-sample(rownames(final.zero.one.rules.df), 0.8*dim(final.zero.one.rules.df)[1])
+train.cart.rules.df <- final.zero.one.rules.df[train.cart.rows.rules,]
+valid.cart.rows.rules <- setdiff(rownames(final.zero.one.rules.df),train.cart.rows.rules)
+valid.cart.rules.df <- final.zero.one.rules.df[valid.cart.rows.rules,]
+#str(train.cart.rules.df)
+
+table(train.cart.rules.df$bad_good_dummy)
+
+###### this tree works
+target.data.df <- train.cart.rules.df[,c(4,5,6,7,8,9,13,14,15,18,21,43:92,93)]
+# oversample here
+#target.data.df <- train.cart.df[,c(4,5,6,7,8:9,22:29,31,32,34,43)]
+#target.data.df <- train.cart.rules.df[,c(86:92,93)] # this works accuracy 40 percent
+#target.data.df <- train.cart.rules.df[,c(92,93)]
+t#arget.data.df <- train.cart.rules.df[,c(4,5,6,7,8,9,13,14,15,18,20,21,93)]
+#target.data.df <- train.cart.rules.df[,c(4,93)] 47 percent
+#target.data.df <- train.cart.rules.df[,c(5,93)] #43 percent
+#target.data.df <- train.cart.rules.df[,c(6,93)] #43 percent
+#target.data.df <- train.cart.rules.df[,c(7,93)] #38 percent
+#target.data.df <- train.cart.rules.df[,c(8,93)] #43 percent
+#target.data.df <- train.cart.rules.df[,c(9,93)] #43 percent
+#target.data.df <- train.cart.rules.df[,c(13,93)] #43 percent
+#target.data.df <- train.cart.rules.df[,c(14,93)] #45 percent
+#target.data.df <- train.cart.rules.df[,c(15,93)] #45 percent
+#target.data.df <- train.cart.rules.df[,c(18,93)] #did not work
+#target.data.df <- train.cart.rules.df[,c(20,93)] #29 percent
+#target.data.df <- train.cart.rules.df[,c(21,93)] #42 percent
+#target.data.df <- train.cart.rules.df[,c(22,93)] #35 percent
+#target.data.df <- train.cart.rules.df[,c(23,24,93)] #38 percent
+#target.data.df <- train.cart.rules.df[,c(23,24,25,93)] #38 percent
+#target.data.df <- train.cart.rules.df[,c(23,24,25,26,93)] #35 percent
+#target.data.df <- train.cart.rules.df[,c(28,29,93)] #31 percent
+#target.data.df <- train.cart.rules.df[,c(23,24,25,26,93)] #35 percent
+#target.data.df <- train.cart.rules.df[,c(30,93)] #32 percent
+#target.data.df <- train.cart.rules.df[,c(31,32,34,93)] #30 percent
+#target.data.df <- train.cart.rules.df[,c(37,93)] #30 percent GETS ZERO
+#target.data.df <- train.cart.rules.df[,c(39,93)] #42 percent
+#target.data.df <- train.cart.rules.df[,c(42,93)] #42 percent
+#target.data.df <- train.cart.rules.df[,c(43,93)] #does not work
+#target.data.df <- train.cart.rules.df[,c(44,93)] #44 percent specificy up
+#target.data.df <- train.cart.rules.df[,c(45,93)] # does not work
+#target.data.df <- train.cart.rules.df[,c(46,93)] # does not work 
+#target.data.df <- train.cart.rules.df[,c(50:52,93)] #43
+#target.data.df <- train.cart.rules.df[,c(55,93)] #does not work 
+#target.data.df <- train.cart.rules.df[,c(62,93)] #does not work 
+#target.data.df <- train.cart.rules.df[,c(65,93)] #does not work 
+#target.data.df <- train.cart.rules.df[,c(81,93)] #does not work 
+#target.data.df <- train.cart.rules.df[,c(82,93)] #47 percent
+#target.data.df <- train.cart.rules.df[,c(83,93)] #45 percent
+#target.data.df <- train.cart.rules.df[,c(84,93)] #78 specificity
+#target.data.df <- train.cart.rules.df[,c(85,93)] #does not work 
+#target.data.df <- train.cart.rules.df[,c(86,93)] #46 percent
+#target.data.df <- train.cart.rules.df[,c(87,93)] #46 percent
+#target.data.df <- train.cart.rules.df[,c(88,93)] #does not work
+#target.data.df <- train.cart.rules.df[,c(89:91,93)] #does not work
+
+##############################
+# best model by hand
+#target.data.df <- train.cart.rules.df[,c(37,93)] #sensitivity
+#target.data.df <- train.cart.rules.df[,c(84,93)] #specificity
+
+subset_1 <-subset(train.cart.df,bad_good_dummy ==1)
+table(subset_1$region)
+
+table(train.cart.df$bad_good_dummy,train.cart.df$region)
+table(train.cart.df$bad_good_dummy,train.cart.df$type.y)
+
+#target.data.df <- train.cart.rules.df[,c(37,84,87,88,93)]
+
+
+#str(target.data.df)
+library(rpart)
+library(rpart.plot)
+library(caret)
+
+class.tree <- rpart(bad_good_dummy ~ ., data = target.data.df, method = "class", cp=0.01)
+options(scipen = 999)
+prp(class.tree, type=1, extra=1, split.font = 1,varlen = -10)
+rpart.plot(class.tree, type=4, digits=-3)
+
+predict.train <- as.data.frame(as.numeric(predict(class.tree, target.data.df, type = "class")))
+colnames(predict.train) <- "predicted"
+#str(predict.train)
+table(predict.train)
+predict.train$predicted <- ifelse(predict.train$predicted == 2,1,0)
+table(predict.train)
+
+table(predict.train$predicted,target.data.df$bad_good_dummy )
+confusionMatrix(data= table(predict.train$predicted, target.data.df$bad_good_dummy))
+
+
+#table(target.data.df$regioncentral_Bohemia,target.data.df$bad_good_dummy)
+#table(target.data.df$regioneast_Bohemia,target.data.df$bad_good_dummy)
+#table(target.data.df$regionnorth_Bohemia,target.data.df$bad_good_dummy)
+#table(target.data.df$regionnorth_Moravia,target.data.df$bad_good_dummy)
+#table(target.data.df$regionPrague,target.data.df$bad_good_dummy)
+#table(target.data.df$regionwest_Bohemia,target.data.df$bad_good_dummy)
+#table(target.data.df$regionsouth_Moravia,target.data.df$bad_good_dummy)
+#table(target.data.df$regionsouth_Bohemia,target.data.df$bad_good_dummy)
+
+
+
+#deeper.tree <-  rpart(bad_good_dummy ~ ., data = target.data.df, method = "class", cp=0.001, minsplit=1)
+
+#length(deeper.tree$frame$var[deeper.tree$frame$var == "<leaf>"])
+
+#prp(deeper.tree, type = 1, extra = 1, under = TRUE, split.font =1, varlen = -10, box.col=ifelse(deeper.tree$frame$var == "<leaf>", 'gray', 'white'))
+
+
+
+#final.data.rules.df 
+
+```
+
+
+Here is the validation of the tree determined above
+
+no oversampling here
+
+```{r, echo=FALSE}
+
+set.seed(275)
+train.cart.rows.rules <-sample(rownames(final.bad.good.data.rules.df), 0.8*dim(final.bad.good.data.rules.df)[1])
+train.cart.rules.df <- final.bad.good.data.rules.df[train.cart.rows.rules,]
+valid.cart.rows.rules <- setdiff(rownames(final.bad.good.data.rules.df),train.cart.rows.rules)
+valid.cart.rules.df <- final.bad.good.data.rules.df[valid.cart.rows.rules,]
+str(train.cart.rules.df)
+############################################################
+
+###### this tree works
+target.data.df <- valid.cart.rules.df[,c(4,5,6,7,8,9,13,14,15,18,21,43:92,93)]
+
+library(rpart)
+library(rpart.plot)
+library(caret)
+
+class.tree <- rpart(bad_good_dummy ~ ., data = target.data.df, method = "class", cp=0.005)
+options(scipen = 999)
+prp(class.tree, type=1, extra=1, split.font = 1,varlen = -10)
+
+predict.train <- as.data.frame(as.numeric(predict(class.tree, target.data.df, type = "class")))
+colnames(predict.train) <- "predicted"
+#str(predict.train)
+table(predict.train)
+predict.train$predicted <- ifelse(predict.train$predicted == 2,1,0)
+table(predict.train)
+
+table(predict.train$predicted,target.data.df$bad_good_dummy )
+confusionMatrix(data= table(predict.train$predicted, target.data.df$bad_good_dummy))
+
+
+
+```
+
+
+
+
+```{r, echo=FALSE}
+#install.packages("adabag")
+
+#library(adabag)
+#library(rpart)
+#library(caret)
+
+
+
+train.cart.rules.df$bad_good_dummy <- as.factor(train.cart.rules.df$bad_good_dummy)     
+target.data.df <- train.cart.rules.df[,c(52,84,93)]
+#boost <-boosting(bad_good_dummy ~ ., data = target.data.df)
+#pred <- predict(boost,target.data.df)
+
+
+#nstall.packages("randomForest")
+library(randomForest)
+rf <- randomForest(bad_good_dummy ~ ., data = target.data.df, ntree =100,mtry=1, nodesize=5, importance=TRUE)
+varImpPlot(rf,type=1)
+
+predict.rf <- as.data.frame(predict(rf,target.data.df))
+colnames(predict.rf) <- c("predicted")
+table(predict.rf)
+#str(predict.rf)
+
+
+predict.rf$predicted <- ifelse(predict.rf$predicted == 1,0,1)
+table(predict.rf)
+table(predict.rf$predicted,target.data.df$bad_good_dummy )
+#confusionMatrix(data= table(predict.rf$predicted,target.data.df$bad_good_dummy ))
+```
+
+logistic
+
+
+look at the full sample
+
+```{r, echo=FALSE}
+
+target.data.df <- final.bad.good.data.rules.df[,c(6,7,13,14,15,22:34,43:47,60:64,67:79,81:83,85:87,89:91,93)]
+str(target.data.df)
+logit.reg <- glm(bad_good_dummy ~ . , data=target.data.df, family = "binomial")
+options(scipen=999)
+summary(logit.reg)
+
+logit.reg.pred <- predict(logit.reg, target.data.df, type = "response")
+
+library(gains)
+target.data.df$bad_good_dummy <- as.numeric(target.data.df$bad_good_dummy)
+gain <- gains(target.data.df$bad_good_dummy,logit.reg.pred, groups=10)
+plot(c(0,gain$cume.pct.of.total*sum(target.data.df$bad_good_dummy))~c(0,gain$cume.obs),xlab = "cases", ylab="cumulative", main="", type="l")
+lines(c(0,sum(target.data.df$bad_good_dummy))~c(0,dim(target.data.df)[1]), lty=2)
+
+target.data.df$bad_good_dummy<- as.numeric(target.data.df$bad_good_dummy)
+heights <- gain$mean.resp/mean(target.data.df$bad_good_dummy)
+midpoints <- barplot(heights,names.arg=gain$depth, ylim=c(0,9), xlab="percentile", ylab="Mean Response", main="Decile-wise lift chart")
+
+text(midpoints, heights + 0.5, labels=round(heights,1), cex=0.8)
+
+```
+now look at logistic regression on full sample with training and validation data
+
+```{r, echo=FALSE}
+set.seed(127)
+all.train.cart.rows.rules <-sample(rownames(final.bad.good.data.rules.df), 0.8*dim(final.bad.good.data.rules.df)[1])
+all.train.cart.rules.df <- final.bad.good.data.rules.df[all.train.cart.rows.rules,]
+all.valid.cart.rows.rules <- setdiff(rownames(final.bad.good.data.rules.df),all.train.cart.rows.rules)
+all.valid.cart.rules.df <- final.bad.good.data.rules.df[all.valid.cart.rows.rules,]
+#str(all.train.cart.rules.df)
+
+table(all.train.cart.rules.df$bad_good_dummy)
+
+```
+
+now look at full sample training data
+
+```{r, echo=FALSE}
+target.data.df <- all.train.cart.rules.df[,c(6,7,13,14,15,43:47,60:64,67:79,81:83,85:87,89:91,93)]
+str(target.data.df)
+logit.reg <- glm(bad_good_dummy ~ . , data=target.data.df, family = "binomial")
+options(scipen=999)
+summary(logit.reg)
+
+logit.reg.pred <- predict(logit.reg, target.data.df, type = "response")
+
+library(gains)
+target.data.df$bad_good_dummy <- as.numeric(target.data.df$bad_good_dummy)
+gain <- gains(target.data.df$bad_good_dummy,logit.reg.pred, groups=10)
+plot(c(0,gain$cume.pct.of.total*sum(target.data.df$bad_good_dummy))~c(0,gain$cume.obs),xlab = "cases", ylab="cumulative", main="", type="l")
+lines(c(0,sum(target.data.df$bad_good_dummy))~c(0,dim(target.data.df)[1]), lty=2)
+
+target.data.df$bad_good_dummy<- as.numeric(target.data.df$bad_good_dummy)
+heights <- gain$mean.resp/mean(target.data.df$bad_good_dummy)
+midpoints <- barplot(heights,names.arg=gain$depth, ylim=c(0,9), xlab="percentile", ylab="Mean Response", main="Decile-wise lift chart")
+
+text(midpoints, heights + 0.5, labels=round(heights,1), cex=0.8)
+```
+now look at logistic regression validation data full sample
+
+
+```{r, echo=FALSE}
+target.data.df <- all.valid.cart.rules.df[,c(6,7,13,14,15,43:47,60:64,67:79,81:83,85:87,89:91,93)]
+
+
+logit.reg.pred <- predict(logit.reg, target.data.df, type = "response")
+
+library(gains)
+target.data.df$bad_good_dummy <- as.numeric(target.data.df$bad_good_dummy)
+gain <- gains(target.data.df$bad_good_dummy,logit.reg.pred, groups=10)
+plot(c(0,gain$cume.pct.of.total*sum(target.data.df$bad_good_dummy))~c(0,gain$cume.obs),xlab = "cases", ylab="cumulative", main="", type="l")
+lines(c(0,sum(target.data.df$bad_good_dummy))~c(0,dim(target.data.df)[1]), lty=2)
+
+target.data.df$bad_good_dummy<- as.numeric(target.data.df$bad_good_dummy)
+heights <- gain$mean.resp/mean(target.data.df$bad_good_dummy)
+midpoints <- barplot(heights,names.arg=gain$depth, ylim=c(0,9), xlab="percentile", ylab="Mean Response", main="Decile-wise lift chart")
+
+text(midpoints, heights + 0.5, labels=round(heights,1), cex=0.8)
+```
+
+
+
+
+LDA
+
+```{r, echo=FALSE}
+library(MASS)
+library(caret)
+library(ggplot2)
+library(standardize)
+train.cart.rules.n <- as.data.frame(scale(train.cart.rules.df[,c(6,7,13,14,15,43:47,60:64,67:79,81:83,85:87,89:91)]))
+dep_var <- as.data.frame(train.cart.rules.df[,c(93)])
+names(dep_var) <- c("bad_good_dummy")
+#str(dep_var)
+#str(train.cart.rules.n)
+
+train.cart.rules.norm <- cbind(train.cart.rules.n,dep_var)
+#str(train.cart.rules.norm)
+
+
+target.data.df <- train.cart.rules.norm
+lda1 <- lda(bad_good_dummy ~ . , data=target.data.df)
+
+
+pred1 <- predict(lda1,target.data.df)
+#str(pred1)
+
+table(pred1$class, target.data.df$bad_good_dummy)  # pred v actual
+confusionMatrix(data=table(pred1$class, target.data.df$bad_good_dummy))
+
+mean(pred1$class ==target.data.df$bad_good_dummy)  # percent accurate
+
+#sum(pred1$posterior[, 1] >=.5)
+  
+#sum(pred1$posterior[, 1] >=.75)  # increase the cut-off from .5 to .75
+```
+
+
+
+now look at the validation set for LDA
+
+```{r, echo=FALSE}
+#with MASS
+library(MASS)
+library(caret)
+library(ggplot2)
+
+
+
+valid.cart.rules.n <- as.data.frame(scale(valid.cart.rules.df[,c(6,7,13,14,15,43:47,60:64,67:79,81:83,85:87,89:91)]))
+dep_var <- as.data.frame(valid.cart.rules.df[,c(93)])
+names(dep_var) <- c("bad_good_dummy")
+#str(dep_var)
+#str(valid.cart.rules.n)
+
+valid.cart.rules.norm <- cbind(valid.cart.rules.n,dep_var)
+#str(valid.cart.rules.norm)
+
+target.data.df <- valid.cart.rules.norm
+###############################################
+# now adjust for priors
+prior <- c(0.9, 0.1)
+###############################################
+lda1v <- lda(bad_good_dummy ~ . , data=target.data.df,prior = prior)
+pred1v <- predict(lda1v,target.data.df)
+#str(pred1v)
+
+table(pred1v$class, target.data.df$bad_good_dummy)  # pred v actual
+mean(pred1v$class ==target.data.df$bad_good_dummy)  # percent accurate
+confusionMatrix(data=table(pred1v$class, target.data.df$bad_good_dummy) , prior = c(0.9,0.1))
+
+#with Discrimant
+library(DiscriMiner)
+
+target.data.df <- valid.cart.rules.df[,c(6,7,13,14,15,43:47,60:64,67:79,81:83,85:87,89:91,93)]
+#str(target.data.df)
+
+lda2v <- linDA(target.data.df[,1:37],target.data.df[,38])
+#str(lda2v)
+
+table(lda2v$classification, target.data.df$bad_good_dummy)  # pred v actual
+
+confusionMatrix(data=table(lda2v$classification, target.data.df$bad_good_dummy))
+```
+
+
+ now look at full sample for training
+ 
+```{r, echo=FALSE}
+library(MASS)
+library(caret)
+library(ggplot2)
+library(standardize)
+train.cart.rules.n <- as.data.frame(scale(all.train.cart.rules.df[,c(6,7,13,14,15,43:47,60:64,67:79,81:83,85:87,89:91)]))
+dep_var <- as.data.frame(all.train.cart.rules.df[,c(93)])
+names(dep_var) <- c("bad_good_dummy")
+#str(dep_var)
+#str(train.cart.rules.n)
+
+train.cart.rules.norm <- cbind(train.cart.rules.n,dep_var)
+#str(train.cart.rules.norm)
+
+
+target.data.df <- train.cart.rules.norm
+lda1 <- lda(bad_good_dummy ~ . , data=target.data.df)
+
+
+pred1 <- predict(lda1,target.data.df)
+#str(pred1)
+
+table(pred1$class, target.data.df$bad_good_dummy)  # pred v actual
+confusionMatrix(data=table(pred1$class, target.data.df$bad_good_dummy) )
+
+mean(pred1$class ==target.data.df$bad_good_dummy)  # percent accurate
+
+```
+ now look at full sample for validation
+ 
+```{r, echo=FALSE}
+library(MASS)
+library(caret)
+library(ggplot2)
+library(standardize)
+valid.cart.rules.n <- as.data.frame(scale(all.valid.cart.rules.df[,c(6,7,13,14,15,43:47,60:64,67:79,81:83,85:87,89:91)]))
+dep_var <- as.data.frame(all.valid.cart.rules.df[,c(93)])
+names(dep_var) <- c("bad_good_dummy")
+#str(dep_var)
+#str(train.cart.rules.n)
+
+valid.cart.rules.norm <- cbind(valid.cart.rules.n,dep_var)
+#str(valid.cart.rules.norm)
+
+
+target.data.df <- valid.cart.rules.norm
+lda1 <- lda(bad_good_dummy ~ . , data=target.data.df)
+
+
+pred1 <- predict(lda1,target.data.df)
+#str(pred1)
+
+table(pred1$class, target.data.df$bad_good_dummy)  # pred v actual
+confusionMatrix(data=table(pred1$class, target.data.df$bad_good_dummy) )
+
+mean(pred1$class ==target.data.df$bad_good_dummy)  # percent accurate
+
+```
+ 
